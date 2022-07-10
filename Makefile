@@ -17,7 +17,7 @@ vet: testdeps
 staticcheck: testdeps
 	$(GOBIN)/staticcheck ./...
 
-lint: vet staticcheck
+lint: vet
 
 test:
 	go test -v -covermode=atomic -coverprofile=coverage.out ./...
