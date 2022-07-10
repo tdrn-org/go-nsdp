@@ -5,7 +5,7 @@ deps:
 	go mod download -x
 
 testdeps: deps
-	go get honnef.co/go/tools/cmd/staticcheck
+	go install honnef.co/go/tools/cmd/staticcheck
 
 tidy:
 	go mod verify
@@ -17,7 +17,7 @@ vet: testdeps
 staticcheck: testdeps
 	$(GOBIN)/staticcheck ./...
 
-lint: vet
+lint: vet staticcheck
 
 test:
 	go test -v -covermode=atomic -coverprofile=coverage.out ./...

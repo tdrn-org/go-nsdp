@@ -103,38 +103,15 @@ func UnmarshalMessageBuffer(buffer *bytes.Buffer) (*Message, error) {
 		if err != nil {
 			return nil, fmt.Errorf("error while decoding TLV value; cause: %v", err)
 		}
-		var tlv TLV
-		switch tlvType {
-		case uint16(TypeDeviceModel):
-			tlv, err = unmarshalDeviceModel(tlvValue)
-		case uint16(TypeDeviceName):
-			tlv, err = unmarshalDeviceName(tlvValue)
-		case uint16(TypeDeviceMAC):
-			tlv, err = unmarshalDeviceMAC(tlvValue)
-		case uint16(TypeDeviceLocation):
-			tlv, err = unmarshalDeviceLocation(tlvValue)
-		case uint16(TypeDeviceIP):
-			tlv, err = unmarshalDeviceIP(tlvValue)
-		case uint16(TypeDeviceNetmask):
-			tlv, err = unmarshalDeviceNetmask(tlvValue)
-		case uint16(TypeRouterIP):
-			tlv, err = unmarshalRouterIP(tlvValue)
-		case uint16(TypePortStatus):
-			tlv, err = unmarshalPortStatus(tlvValue)
-		case uint16(TypePortStatistic):
-			tlv, err = unmarshalPortStatistic(tlvValue)
-		default:
-			return nil, fmt.Errorf("unrecognized TLV type: %04xh", tlvType)
-		}
+		tlv, err := unmarshalTLV(tlvType, tlvValue)
 		if err != nil {
 			return nil, fmt.Errorf("error while decoding TLV type %04xh; cause: %v", tlvType, err)
 		}
 		tlvs = append(tlvs, tlv)
 	}
-	m := &Message{
+	return &Message{
 		Header: *header,
 		Body:   tlvs,
 		EOM:    newEOM(),
-	}
-	return m, nil
+	}, nil
 }
