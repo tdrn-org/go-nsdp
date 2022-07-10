@@ -7,6 +7,8 @@
 //
 package nsdp
 
+import "fmt"
+
 type Type uint16
 
 // TLV message element types
@@ -35,4 +37,28 @@ type TLV interface {
 	Type() Type
 	Length() uint16
 	Value() []byte
+}
+
+func unmarshalTLV(tlvType uint16, tlvValue []byte) (TLV, error) {
+	switch tlvType {
+	case uint16(TypeDeviceModel):
+		return unmarshalDeviceModel(tlvValue)
+	case uint16(TypeDeviceName):
+		return unmarshalDeviceName(tlvValue)
+	case uint16(TypeDeviceMAC):
+		return unmarshalDeviceMAC(tlvValue)
+	case uint16(TypeDeviceLocation):
+		return unmarshalDeviceLocation(tlvValue)
+	case uint16(TypeDeviceIP):
+		return unmarshalDeviceIP(tlvValue)
+	case uint16(TypeDeviceNetmask):
+		return unmarshalDeviceNetmask(tlvValue)
+	case uint16(TypeRouterIP):
+		return unmarshalRouterIP(tlvValue)
+	case uint16(TypePortStatus):
+		return unmarshalPortStatus(tlvValue)
+	case uint16(TypePortStatistic):
+		return unmarshalPortStatistic(tlvValue)
+	}
+	return nil, fmt.Errorf("unrecognized TLV type: %04xh", tlvType)
 }
