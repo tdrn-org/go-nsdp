@@ -203,7 +203,7 @@ func (c *Conn) receiveMessage() (*Message, error) {
 }
 
 func lookupHardwareAddr(addr *net.UDPAddr) (net.HardwareAddr, error) {
-	// lo has no real MAC
+	// lo has no real MAC; use 00:00:00:00:00:00
 	if addr.IP.IsLoopback() {
 		return make([]byte, 6), nil
 	}
@@ -216,6 +216,9 @@ func lookupHardwareAddr(addr *net.UDPAddr) (net.HardwareAddr, error) {
 		if err == nil {
 			for _, ifaceAddr := range ifaceAddrs {
 				if strings.HasPrefix(ifaceAddr.String(), addr.IP.String()) {
+					if len(iface.HardwareAddr) != 6 {
+						return nil, fmt.Errorf("failed to lookup hardware address for interface %s", iface.Name)
+					}
 					return iface.HardwareAddr, nil
 				}
 			}
