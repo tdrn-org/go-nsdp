@@ -26,7 +26,10 @@ func NewDeviceNetmask(netmask net.IP) *DeviceNetmask {
 
 func unmarshalDeviceNetmask(bytes []byte) (*DeviceNetmask, error) {
 	len := len(bytes)
-	if len != 0 && len != 4 && len != 16 {
+	if len == 0 {
+		return EmptyDeviceNetmask(), nil
+	}
+	if len != 4 && len != 16 {
 		return nil, fmt.Errorf("unexpected device netmask length: %d", len)
 	}
 	return NewDeviceNetmask(net.IP(bytes)), nil

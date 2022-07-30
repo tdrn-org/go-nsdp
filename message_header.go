@@ -24,7 +24,7 @@ type Header struct {
 	HostAddress   net.HardwareAddr
 	DeviceAddress net.HardwareAddr
 	Unknown2      uint16
-	Sequence      uint16
+	Sequence      Sequence
 	Signature     Signature
 	Unknown3      uint32
 }
@@ -46,19 +46,36 @@ const (
 
 type OperationResult uint16
 
+type Sequence uint16
+
 type Signature uint32
 
 const (
 	NSDPSignature Signature = 0x4e534450
 )
 
-func newHeader(operation OperationCode) Header {
-	return Header{
+func newHeader(operation OperationCode) *Header {
+	return &Header{
 		Version:       ProtoVersion1,
 		Operation:     operation,
 		HostAddress:   make([]byte, 6),
 		DeviceAddress: make([]byte, 6),
 		Signature:     NSDPSignature,
+	}
+}
+
+func (h *Header) prepareHeader(hostAddress net.HardwareAddr, sequence Sequence) *Header {
+	return &Header{
+		Version:       h.Version,
+		Operation:     h.Operation,
+		Result:        h.Result,
+		Unknown1:      h.Unknown1,
+		HostAddress:   hostAddress,
+		DeviceAddress: h.DeviceAddress,
+		Unknown2:      h.Unknown2,
+		Sequence:      sequence,
+		Signature:     h.Signature,
+		Unknown3:      h.Unknown3,
 	}
 }
 

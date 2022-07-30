@@ -11,14 +11,15 @@ import (
 	"bytes"
 	"encoding/binary"
 	"fmt"
+	"net"
 	"strings"
 )
 
 // NSDP message struct (see https://en.wikipedia.org/wiki/Netgear_Switch_Discovery_Protocol)
 type Message struct {
-	Header
-	Body []TLV
-	EOM
+	Header *Header
+	Body   []TLV
+	EOM    *EOM
 }
 
 // NewMessage constructs a new message for the given operation code.
@@ -27,6 +28,14 @@ func NewMessage(operation OperationCode) *Message {
 		Header: newHeader(operation),
 		Body:   make([]TLV, 0),
 		EOM:    newEOM(),
+	}
+}
+
+func (m *Message) prepareMessage(hostAddress net.HardwareAddr, sequence Sequence) *Message {
+	return &Message{
+		Header: m.Header.prepareHeader(hostAddress, sequence),
+		Body:   m.Body,
+		EOM:    m.EOM,
 	}
 }
 
@@ -110,7 +119,7 @@ func UnmarshalMessageBuffer(buffer *bytes.Buffer) (*Message, error) {
 		tlvs = append(tlvs, tlv)
 	}
 	return &Message{
-		Header: *header,
+		Header: header,
 		Body:   tlvs,
 		EOM:    newEOM(),
 	}, nil

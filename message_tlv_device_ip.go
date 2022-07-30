@@ -26,7 +26,10 @@ func NewDeviceIP(ip net.IP) *DeviceIP {
 
 func unmarshalDeviceIP(bytes []byte) (*DeviceIP, error) {
 	len := len(bytes)
-	if len != 0 && len != 4 && len != 16 {
+	if len == 0 {
+		return EmptyDeviceIP(), nil
+	}
+	if len != 4 && len != 16 {
 		return nil, fmt.Errorf("unexpected device IP length: %d", len)
 	}
 	return NewDeviceIP(net.IP(bytes)), nil

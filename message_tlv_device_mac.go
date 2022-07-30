@@ -26,7 +26,10 @@ func NewDeviceMAC(mac net.HardwareAddr) *DeviceMAC {
 
 func unmarshalDeviceMAC(bytes []byte) (*DeviceMAC, error) {
 	len := len(bytes)
-	if len != 0 && len != 6 {
+	if len == 0 {
+		return EmptyDeviceMAC(), nil
+	}
+	if len != 6 {
 		return nil, fmt.Errorf("unexpected device MAC length: %d", len)
 	}
 	return NewDeviceMAC(net.HardwareAddr(bytes)), nil

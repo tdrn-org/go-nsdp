@@ -26,7 +26,10 @@ func NewRouterIP(ip net.IP) *RouterIP {
 
 func unmarshalRouterIP(bytes []byte) (*RouterIP, error) {
 	len := len(bytes)
-	if len != 0 && len != 4 && len != 16 {
+	if len == 0 {
+		return EmptyRouterIP(), nil
+	}
+	if len != 4 && len != 16 {
 		return nil, fmt.Errorf("unexpected router IP length: %d", len)
 	}
 	return NewRouterIP(net.IP(bytes)), nil

@@ -72,6 +72,30 @@ func TestRouterIPString(t *testing.T) {
 	runMessageStringTest(t, NewRouterIP(getStaticIP()), "Header: 01h 02h 0000h 00000000h 00:00:00:00:00:00 00:00:00:00:00:00 0000h 0000h 4e534450h\nTLV[0]: RouterIP(0008h) 1.2.3.4\nEOM   : ffff0000h")
 }
 
+func TestDHCPModeMarshaling(t *testing.T) {
+	runMessageMarshalingTest(t, NewDHCPMode(1))
+}
+
+func TestDHCPModeString(t *testing.T) {
+	runMessageStringTest(t, NewDHCPMode(1), "Header: 01h 02h 0000h 00000000h 00:00:00:00:00:00 00:00:00:00:00:00 0000h 0000h 4e534450h\nTLV[0]: DHCPMode(000bh) Enabled\nEOM   : ffff0000h")
+}
+
+func TestFWVersionSlot1Marshaling(t *testing.T) {
+	runMessageMarshalingTest(t, NewFWVersionSlot1("1.2.3.4"))
+}
+
+func TestFWVersionSlot1String(t *testing.T) {
+	runMessageStringTest(t, NewFWVersionSlot1("1.2.3.4"), "Header: 01h 02h 0000h 00000000h 00:00:00:00:00:00 00:00:00:00:00:00 0000h 0000h 4e534450h\nTLV[0]: FWVersionSlot1(000dh) '1.2.3.4'\nEOM   : ffff0000h")
+}
+
+func TestFWVersionSlot2Marshaling(t *testing.T) {
+	runMessageMarshalingTest(t, NewFWVersionSlot2("4.3.2.1"))
+}
+
+func TestFWVersionSlot2String(t *testing.T) {
+	runMessageStringTest(t, NewFWVersionSlot2("4.3.2.1"), "Header: 01h 02h 0000h 00000000h 00:00:00:00:00:00 00:00:00:00:00:00 0000h 0000h 4e534450h\nTLV[0]: FWVersionSlot2(000eh) '4.3.2.1'\nEOM   : ffff0000h")
+}
+
 func TestPortStatusMarshaling(t *testing.T) {
 	runMessageMarshalingTest(t, NewPortStatus(1, 2))
 }
@@ -89,6 +113,20 @@ func TestPortStatisticString(t *testing.T) {
 }
 
 func runMessageMarshalingTest(t *testing.T, tlv TLV) {
+	runRequestMessageMarshalingTest(t, tlv)
+	runResponseMessageMarshalingTest(t, tlv)
+}
+
+func runRequestMessageMarshalingTest(t *testing.T, tlv TLV) {
+	message1 := NewMessage(ReadRequest)
+	message1.AppendTLV(tlv)
+	marshaledBytes := message1.Marshal()
+	message2, err := UnmarshalMessage(marshaledBytes)
+	require.Nil(t, err)
+	unmarshaledBytes := message2.Marshal()
+	require.Equal(t, marshaledBytes, unmarshaledBytes)
+}
+func runResponseMessageMarshalingTest(t *testing.T, tlv TLV) {
 	message1 := NewMessage(ReadResponse)
 	message1.AppendTLV(tlv)
 	marshaledBytes := message1.Marshal()

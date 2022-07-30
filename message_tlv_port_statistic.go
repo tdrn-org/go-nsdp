@@ -43,6 +43,9 @@ func NewPortStatistic(port uint8, received uint64, send uint64, packets uint64, 
 
 func unmarshalPortStatistic(value []byte) (*PortStatistic, error) {
 	len := len(value)
+	if len == 0 {
+		return EmptyPortStatistic(), nil
+	}
 	if len != int(portStatisticLen) {
 		return nil, fmt.Errorf("unexpected port statistic length: %d", len)
 	}

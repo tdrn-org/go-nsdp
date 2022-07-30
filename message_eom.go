@@ -24,8 +24,8 @@ type EOM struct {
 	Marker uint32
 }
 
-func newEOM() EOM {
-	return EOM{
+func newEOM() *EOM {
+	return &EOM{
 		Marker: uint32(EOMMarker),
 	}
 }

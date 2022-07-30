@@ -33,6 +33,9 @@ func NewPortStatus(port uint8, status uint8) *PortStatus {
 
 func unmarshalPortStatus(value []byte) (*PortStatus, error) {
 	len := len(value)
+	if len == 0 {
+		return EmptyPortStatus(), nil
+	}
 	if len != int(portStatusLen) {
 		return nil, fmt.Errorf("unexpected port status length: %d", len)
 	}

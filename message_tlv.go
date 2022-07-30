@@ -55,6 +55,14 @@ func unmarshalTLV(tlvType uint16, tlvValue []byte) (TLV, error) {
 		return unmarshalDeviceNetmask(tlvValue)
 	case uint16(TypeRouterIP):
 		return unmarshalRouterIP(tlvValue)
+	case uint16(TypeDHCPMode):
+		return unmarshalDHCPMode(tlvValue)
+	case uint16(TypeFWVersionSlot1):
+		return unmarshalFWVersionSlot1(tlvValue)
+	case uint16(TypeFWVersionSlot2):
+		return unmarshalFWVersionSlot2(tlvValue)
+	case uint16(TypeNextFWSlot):
+		return unmarshalNextFWSlot(tlvValue)
 	case uint16(TypePortStatus):
 		return unmarshalPortStatus(tlvValue)
 	case uint16(TypePortStatistic):
