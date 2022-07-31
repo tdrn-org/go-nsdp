@@ -109,7 +109,7 @@ func TestPortStatisticMarshaling(t *testing.T) {
 }
 
 func TestPortStatisticString(t *testing.T) {
-	runMessageStringTest(t, NewPortStatistic(1, 2, 3, 4, 5, 6, 7), "Header: 01h 02h 0000h 00000000h 00:00:00:00:00:00 00:00:00:00:00:00 0000h 0000h 4e534450h\nTLV[0]: PortStatistic(1000h) Port1 Received: 2, Send: 3, Packets: 4, Broadcasts: 5, Multicasts: 6, Errors: 7\nEOM   : ffff0000h")
+	runMessageStringTest(t, NewPortStatistic(1, 2, 3, 4, 5, 6, 7), "Header: 01h 02h 0000h 00000000h 00:00:00:00:00:00 00:00:00:00:00:00 0000h 0000h 4e534450h\nTLV[0]: PortStatistic(1000h) Port1 Received: 2, Sent: 3, Packets: 4, Broadcasts: 5, Multicasts: 6, Errors: 7\nEOM   : ffff0000h")
 }
 
 func runMessageMarshalingTest(t *testing.T, tlv TLV) {

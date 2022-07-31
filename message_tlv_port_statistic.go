@@ -19,7 +19,7 @@ import (
 type PortStatistic struct {
 	Port       uint8  // The number of the port this statistic refers to
 	Received   uint64 // Number of received bytes
-	Send       uint64 // Number of send bytes
+	Sent       uint64 // Number of sent bytes
 	Packets    uint64 // Number of processed packets
 	Broadcasts uint64 // Number of processed broadcasts
 	Multicasts uint64 // Number of processed multicasts
@@ -32,11 +32,11 @@ func EmptyPortStatistic() *PortStatistic {
 	return &PortStatistic{}
 }
 
-func NewPortStatistic(port uint8, received uint64, send uint64, packets uint64, broadcasts uint64, multicasts uint64, errors uint64) *PortStatistic {
+func NewPortStatistic(port uint8, received uint64, sent uint64, packets uint64, broadcasts uint64, multicasts uint64, errors uint64) *PortStatistic {
 	return &PortStatistic{
 		Port:       port,
 		Received:   received,
-		Send:       send,
+		Sent:       sent,
 		Packets:    packets,
 		Broadcasts: broadcasts,
 		Multicasts: multicasts,
@@ -56,7 +56,7 @@ func unmarshalPortStatistic(value []byte) (*PortStatistic, error) {
 	tlv := EmptyPortStatistic()
 	tlv.Port, _ = buffer.ReadByte()
 	binary.Read(buffer, binary.BigEndian, &tlv.Received)
-	binary.Read(buffer, binary.BigEndian, &tlv.Send)
+	binary.Read(buffer, binary.BigEndian, &tlv.Sent)
 	binary.Read(buffer, binary.BigEndian, &tlv.Packets)
 	binary.Read(buffer, binary.BigEndian, &tlv.Broadcasts)
 	binary.Read(buffer, binary.BigEndian, &tlv.Multicasts)
@@ -77,7 +77,7 @@ func (tlv *PortStatistic) Value() []byte {
 	buffer.Grow(int(portStatisticLen))
 	buffer.WriteByte(tlv.Port)
 	binary.Write(buffer, binary.BigEndian, tlv.Received)
-	binary.Write(buffer, binary.BigEndian, tlv.Send)
+	binary.Write(buffer, binary.BigEndian, tlv.Sent)
 	binary.Write(buffer, binary.BigEndian, tlv.Packets)
 	binary.Write(buffer, binary.BigEndian, tlv.Broadcasts)
 	binary.Write(buffer, binary.BigEndian, tlv.Multicasts)
@@ -86,5 +86,5 @@ func (tlv *PortStatistic) Value() []byte {
 }
 
 func (tlv *PortStatistic) String() string {
-	return fmt.Sprintf("PortStatistic(%04xh) Port%d Received: %d, Send: %d, Packets: %d, Broadcasts: %d, Multicasts: %d, Errors: %d", TypePortStatistic, tlv.Port, tlv.Received, tlv.Send, tlv.Packets, tlv.Broadcasts, tlv.Multicasts, tlv.Errors)
+	return fmt.Sprintf("PortStatistic(%04xh) Port%d Received: %d, Sent: %d, Packets: %d, Broadcasts: %d, Multicasts: %d, Errors: %d", TypePortStatistic, tlv.Port, tlv.Received, tlv.Sent, tlv.Packets, tlv.Broadcasts, tlv.Multicasts, tlv.Errors)
 }
