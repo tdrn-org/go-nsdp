@@ -190,25 +190,40 @@ func (c *Conn) receiveMessage() (*Message, error) {
 		if err != nil {
 			return nil, err
 		}
-		msg, err := UnmarshalMessage(buffer[:len])
+		msg, err := c.unmarshalReceivedMessage(addr, buffer[:len])
 		if err != nil {
-			if c.Debug {
-				log.Printf("NSDP %s < %s:\n%s", c.laddr, addr, hex.EncodeToString(buffer[:len]))
-				log.Printf("NSDP Error while unmarshaling message; cause: %v", err)
-			}
 			return nil, err
 		}
-		if msg.Header.Sequence == c.seq {
-			if c.Debug {
-				log.Printf("NSDP %s < %s:\n%s\n%s", c.laddr, addr, hex.EncodeToString(buffer[:len]), msg)
-			}
-			return msg, nil
-		} else {
-			if c.Debug {
-				log.Printf("NSDP %s < %s:\nIgnoring unsolicted message (sequence: %04xh)", c.laddr, addr, msg.Header.Sequence)
-			}
+		if !c.checkMessageSequence(addr, msg) {
+			continue
 		}
+		if c.Debug {
+			log.Printf("NSDP %s < %s:\n%s\n%s", c.laddr, addr, hex.EncodeToString(buffer[:len]), msg)
+		}
+		return msg, nil
 	}
+}
+
+func (c *Conn) unmarshalReceivedMessage(addr *net.UDPAddr, received []byte) (*Message, error) {
+	msg, err := UnmarshalMessage(received)
+	if err != nil {
+		if c.Debug {
+			log.Printf("NSDP %s < %s:\n%s", c.laddr, addr, hex.EncodeToString(received))
+			log.Printf("NSDP Error while unmarshaling message; cause: %v", err)
+		}
+		return nil, err
+	}
+	return msg, nil
+}
+
+func (c *Conn) checkMessageSequence(addr *net.UDPAddr, msg *Message) bool {
+	if msg.Header.Sequence != c.seq {
+		if c.Debug {
+			log.Printf("NSDP %s < %s:\nIgnoring unsolicted message (sequence: %04xh)", c.laddr, addr, msg.Header.Sequence)
+		}
+		return false
+	}
+	return true
 }
 
 func lookupHardwareAddr(addr *net.UDPAddr) (net.HardwareAddr, error) {
@@ -221,17 +236,24 @@ func lookupHardwareAddr(addr *net.UDPAddr) (net.HardwareAddr, error) {
 		return nil, err
 	}
 	for _, iface := range ifaces {
-		ifaceAddrs, err := iface.Addrs()
-		if err == nil {
-			for _, ifaceAddr := range ifaceAddrs {
-				if strings.HasPrefix(ifaceAddr.String(), addr.IP.String()) {
-					if len(iface.HardwareAddr) != 6 {
-						return nil, fmt.Errorf("failed to lookup hardware address for interface %s", iface.Name)
-					}
-					return iface.HardwareAddr, nil
-				}
+		if isMatchingInterface(addr, &iface) {
+			if len(iface.HardwareAddr) != 6 {
+				return nil, fmt.Errorf("failed to lookup hardware address for interface %s", iface.Name)
 			}
+			return iface.HardwareAddr, nil
 		}
 	}
 	return nil, fmt.Errorf("failed to lookup hardware address for address: %s", addr)
+}
+
+func isMatchingInterface(addr *net.UDPAddr, iface *net.Interface) bool {
+	ifaceAddrs, err := iface.Addrs()
+	if err == nil {
+		for _, ifaceAddr := range ifaceAddrs {
+			if strings.HasPrefix(ifaceAddr.String(), addr.IP.String()) {
+				return true
+			}
+		}
+	}
+	return false
 }
