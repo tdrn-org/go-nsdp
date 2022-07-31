@@ -5,7 +5,7 @@ deps:
 	go mod download -x
 
 testdeps: deps
-	go install honnef.co/go/tools/cmd/staticcheck@latest
+	go install honnef.co/go/tools/cmd/staticcheck@2022.1.3
 
 tidy:
 	go mod verify
