@@ -103,7 +103,10 @@ func UnmarshalMessageBuffer(buffer *bytes.Buffer) (*Message, error) {
 		var tlvLength uint16
 		err = binary.Read(buffer, binary.BigEndian, &tlvLength)
 		if err != nil {
-			return nil, fmt.Errorf("error while decoding TLV type; cause: %v", err)
+			return nil, fmt.Errorf("error while decoding TLV length; cause: %v", err)
+		}
+		if tlvLength > uint16(buffer.Len()) {
+			return nil, fmt.Errorf("excessive TLV length: %d (remaining: %d)", tlvLength, buffer.Len())
 		}
 		if tlvType == uint16(TypeEOM) {
 			if tlvLength != 0 {
