@@ -12,9 +12,12 @@ import (
 	"fmt"
 )
 
+// TLV to exchange the target device's port status.
+//
+// Add an empty PortStatus TLV to a read request to receive a filled one for each of the device's port.
 type PortStatus struct {
-	Port     uint8
-	Status   uint8
+	Port     uint8 // The number of the port this status refers to
+	Status   uint8 // The port's status (0: down, otherwise up)
 	Unknown1 uint8
 }
 
@@ -68,6 +71,7 @@ func (tlv *PortStatus) String() string {
 	return fmt.Sprintf("PortStatus(%04xh) Port%d Status: %s Unknown1: %02xh", TypePortStatus, tlv.Port, tlv.StatusString(), tlv.Unknown1)
 }
 
+// StatusString returns a textual representation of the status value.
 func (tlv *PortStatus) StatusString() string {
 	switch tlv.Status {
 	case 0:

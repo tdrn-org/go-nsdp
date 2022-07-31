@@ -12,6 +12,7 @@ import (
 	"net"
 )
 
+// TLV to exchange the target device's gateway address.
 type RouterIP struct {
 	IP net.IP
 }

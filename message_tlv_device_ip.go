@@ -12,8 +12,11 @@ import (
 	"net"
 )
 
+// TLV to exchange the target device's IP address.
+//
+// Add an empty DeviceIP TLV to a read request to get a filled one back.
 type DeviceIP struct {
-	IP net.IP
+	IP net.IP // Device IP
 }
 
 func EmptyDeviceIP() *DeviceIP {

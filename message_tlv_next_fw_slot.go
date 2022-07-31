@@ -11,8 +11,11 @@ import (
 	"fmt"
 )
 
+// TLV to exchange the target device's firmware slot for booting.
+//
+// Add an empty NextFWSlot TLV to a read request to get a filled one back.
 type NextFWSlot struct {
-	Slot uint8
+	Slot uint8 // The slot (1 or 2) to use for next boot
 }
 
 const nextFWSlotLen uint16 = 1

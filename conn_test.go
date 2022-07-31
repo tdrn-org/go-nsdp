@@ -16,9 +16,9 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-//const connTestTarget string = Version2IPv4BroadcastTarget
+const connTestTarget string = IPv4BroadcastTarget
 
-const connTestTarget string = "127.0.0.1:63322"
+//const connTestTarget string = "127.0.0.1:63322"
 
 func TestConnSendReceiveMessageBroadcast(t *testing.T) {
 	server, err := startTestServer(connTestTarget)

@@ -20,6 +20,7 @@ const (
 	EOMMarker MessageMarker = 0xffff0000
 )
 
+// EOM (end-of-message) marker terminating any NSDP message.
 type EOM struct {
 	Marker uint32
 }

@@ -15,14 +15,18 @@ import (
 	"strings"
 )
 
-// NSDP message struct (see https://en.wikipedia.org/wiki/Netgear_Switch_Discovery_Protocol)
+// NSDP message (see https://en.wikipedia.org/wiki/Netgear_Switch_Discovery_Protocol).
+//
+// A message is constructed from a Header an EOM marker as well as an arbitary number of TLV (type-length-value) payload elements.
+// The Header defines the general message processing rules (espcially type of operation and target device). The TLV elements define
+// the actual message content.
 type Message struct {
-	Header *Header
-	Body   []TLV
-	EOM    *EOM
+	Header *Header // Message header
+	Body   []TLV   // Message body (payload)
+	EOM    *EOM    // End-of-message marker
 }
 
-// NewMessage constructs a new message for the given operation code.
+// NewMessage constructs a new message for the given operation code with an empty list of TLVs.
 func NewMessage(operation OperationCode) *Message {
 	return &Message{
 		Header: newHeader(operation),

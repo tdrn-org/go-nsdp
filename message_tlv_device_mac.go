@@ -12,8 +12,11 @@ import (
 	"net"
 )
 
+// TLV to exchange the target device's MAC address.
+//
+// Add an empty DeviceMAC TLV to a read request to get a filled one back.
 type DeviceMAC struct {
-	MAC net.HardwareAddr
+	MAC net.HardwareAddr // Device MAC
 }
 
 func EmptyDeviceMAC() *DeviceMAC {

@@ -15,17 +15,19 @@ import (
 	"strings"
 )
 
-// Header NSDP message header
+// Header for any kind of NSDP message.
+//
+// The header defines the type of operation (Operation) and the targeted device (DeviceAddress).
 type Header struct {
-	Version       ProtoVersion
-	Operation     OperationCode
-	Result        OperationResult
+	Version       ProtoVersion    // Always 1 (see ProtoVersion type)
+	Operation     OperationCode   // One of read-request, read-response, write-request or write response (see OperationCode type)
+	Result        OperationResult // The actual message processing result (0 indicating success)
 	Unknown1      uint32
-	HostAddress   net.HardwareAddr
-	DeviceAddress net.HardwareAddr
+	HostAddress   net.HardwareAddr // MAC of the sending device (is handled automatically during message processing)
+	DeviceAddress net.HardwareAddr // MAC of the target device (keeping the default 00:00:00:00:00:00 addresses all devices)
 	Unknown2      uint16
-	Sequence      Sequence
-	Signature     Signature
+	Sequence      Sequence  // Used to identify/verify a request-response sequence (is handled automatically during message processing)
+	Signature     Signature // NSDP signature (should not be changed)
 	Unknown3      uint32
 }
 

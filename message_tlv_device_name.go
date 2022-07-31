@@ -11,8 +11,11 @@ import (
 	"fmt"
 )
 
+// TLV to exchange the target device's name.
+//
+// Add an empty DeviceName TLV to a read request to get a filled one back.
 type DeviceName struct {
-	Name string
+	Name string // Device Name
 }
 
 func EmptyDeviceName() *DeviceName {

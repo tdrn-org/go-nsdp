@@ -11,8 +11,11 @@ import (
 	"fmt"
 )
 
+// TLV to exchange the target device's DHCP mode.
+//
+// Add an empty DHCPMode TLV to a read request to get a filled one back.
 type DHCPMode struct {
-	Mode uint8
+	Mode uint8 // DHCP mode (0: disabled, 1: enabled)
 }
 
 const dhcpModeLen uint16 = 1
@@ -54,6 +57,7 @@ func (tlv *DHCPMode) String() string {
 	return fmt.Sprintf("DHCPMode(%04xh) %s", TypeDHCPMode, tlv.ModeString())
 }
 
+// ModeString returns a textual representation of the mode value.
 func (tlv *DHCPMode) ModeString() string {
 	switch tlv.Mode {
 	case 0:

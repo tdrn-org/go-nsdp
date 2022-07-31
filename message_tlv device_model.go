@@ -11,8 +11,11 @@ import (
 	"fmt"
 )
 
+// TLV to exchange the target device's model name.
+//
+// Add an empty DeviceModel TLV to a read request to get a filled one back.
 type DeviceModel struct {
-	Model string
+	Model string // Model name (e.g. GS108Ev3)
 }
 
 func EmptyDeviceModel() *DeviceModel {

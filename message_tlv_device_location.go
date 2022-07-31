@@ -11,8 +11,11 @@ import (
 	"fmt"
 )
 
+// TLV to exchange the target device's location.
+//
+// Add an empty DeviceLocation TLV to a read request to get a filled one back.
 type DeviceLocation struct {
-	Location string
+	Location string // Device location text
 }
 
 func EmptyDeviceLocation() *DeviceLocation {

@@ -18,6 +18,10 @@ import (
 	"time"
 )
 
+const defaultReceiveBufferSize uint = 8192
+const defaultReceiveQueueLength uint = 16
+const defaultReceiveTimeout time.Duration = 2000 * time.Millisecond
+
 // Conn represents a network connection used for sending and receiving NSDP messages.
 type Conn struct {
 	laddr              *net.UDPAddr
@@ -25,10 +29,10 @@ type Conn struct {
 	host               net.HardwareAddr
 	conn               *net.UDPConn
 	seq                Sequence
-	ReceiveBufferSize  uint // Receive buffer size
-	ReceiveQueueLength uint // Receive queue length
-	ReceiveTimeout     time.Duration
-	Debug              bool // Enables debug output via log.Printf
+	ReceiveBufferSize  uint          // Receive buffer size (defaults to 8192)
+	ReceiveQueueLength uint          // Receive queue length (defaults to 16)
+	ReceiveTimeout     time.Duration // Receive timeout (defaults to 2s)
+	Debug              bool          // Enables debug output via log.Printf
 }
 
 // NewConn establishes a new connection to the given remote target.
@@ -76,9 +80,9 @@ func NewConn(target string, debug bool) (*Conn, error) {
 		host:               host,
 		conn:               conn,
 		seq:                Sequence(time.Now().UnixNano()),
-		ReceiveBufferSize:  8192,
-		ReceiveQueueLength: 16,
-		ReceiveTimeout:     time.Millisecond * 2000,
+		ReceiveBufferSize:  defaultReceiveBufferSize,
+		ReceiveQueueLength: defaultReceiveQueueLength,
+		ReceiveTimeout:     defaultReceiveTimeout,
 		Debug:              debug,
 	}, nil
 }
@@ -90,9 +94,14 @@ func (c *Conn) Close() error {
 
 // SendReceiveMessage sends the given NSDP message and waits for responses.
 //
-// Prior to sending the message's host address and sequence number is updated according to the current connection state.
-// If the message's device address is empty, an arbitrary number of response message is returned.
-// If the message's device address has been set, exactly one response message is returned.
+// The submitted message's host address and sequence number are ignored. Instead the connection state
+// is used to populate this info.
+// If the message's device address is empty (00:00:00:00:00:00), an arbitrary number of response messages is returned
+// and the call will utilize the full receive timeframe defined by ReceiveTimeout to wait for responses.
+// If the message's device address has been set, exactly one response message is returned and the call will return as
+// as one response is received.
+// The returned map is build up using the responding device's hardware address string as the key and the corresponding
+// response message as the value.
 func (c *Conn) SendReceiveMessage(msg *Message) (map[string]*Message, error) {
 	c.seq += 1
 	c.conn.SetReadDeadline(time.Now().Add(c.ReceiveTimeout))
@@ -203,7 +212,7 @@ func (c *Conn) receiveMessage() (*Message, error) {
 }
 
 func lookupHardwareAddr(addr *net.UDPAddr) (net.HardwareAddr, error) {
-	// lo has no real MAC; use 00:00:00:00:00:00
+	// lo has no real MAC; use 00:00:00:00:00:00 in this case
 	if addr.IP.IsLoopback() {
 		return make([]byte, 6), nil
 	}

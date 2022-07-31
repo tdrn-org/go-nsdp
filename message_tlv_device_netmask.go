@@ -12,8 +12,11 @@ import (
 	"net"
 )
 
+// TLV to exchange the target device's netmask.
+//
+// Add an empty DeviceNetmask TLV to a read request to get a filled one back.
 type DeviceNetmask struct {
-	Netmask net.IP
+	Netmask net.IP // Device netmask
 }
 
 func EmptyDeviceNetmask() *DeviceNetmask {

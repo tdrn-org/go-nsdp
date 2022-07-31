@@ -32,7 +32,7 @@ const (
 	TypeEOM            Type = 0xffff // EOM marker prefix (always the last TLV and automatically part of each message)
 )
 
-// Type-length-value message element's interface
+// Interface for all kinds of NSDP TLV (type-length-value) message elements.
 type TLV interface {
 	Type() Type
 	Length() uint16

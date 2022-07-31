@@ -2,4 +2,4 @@
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=hdecarne-github_go-nsdp&metric=coverage)](https://sonarcloud.io/summary/new_code?id=hdecarne-github_go-nsdp)
 
 ## About go-nsdp library
-This library implements the Netgear Switch Discovery Protocol ([NSDP](https://en.wikipedia.org/wiki/Netgear_Switch_Discovery_Protocol)).
+This library provides support for the Netgear Switch Discovery Protocol ([NSDP](https://en.wikipedia.org/wiki/Netgear_Switch_Discovery_Protocol)).

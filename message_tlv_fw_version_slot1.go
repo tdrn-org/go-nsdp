@@ -11,8 +11,11 @@ import (
 	"fmt"
 )
 
+// TLV to exchange the target device's firmware version for firmware slot 1.
+//
+// Add an empty FWVersionSlot1 TLV to a read request to get a filled one back.
 type FWVersionSlot1 struct {
-	Version string
+	Version string // Slot 1 version (e.g. 2.06.17)
 }
 
 func EmptyFWVersionSlot1() *FWVersionSlot1 {

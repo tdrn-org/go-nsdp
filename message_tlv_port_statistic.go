@@ -13,14 +13,17 @@ import (
 	"fmt"
 )
 
+// TLV to exchange the target device's port statistic.
+//
+// Add an empty PortStatistic TLV to a read request to receive a filled one for each of the device's port.
 type PortStatistic struct {
-	Port       uint8
-	Received   uint64
-	Send       uint64
-	Packets    uint64
-	Broadcasts uint64
-	Multicasts uint64
-	Errors     uint64
+	Port       uint8  // The number of the port this statistic refers to
+	Received   uint64 // Number of received bytes
+	Send       uint64 // Number of send bytes
+	Packets    uint64 // Number of processed packets
+	Broadcasts uint64 // Number of processed broadcasts
+	Multicasts uint64 // Number of processed multicasts
+	Errors     uint64 // Number of encountered errors
 }
 
 const portStatisticLen uint16 = 49
