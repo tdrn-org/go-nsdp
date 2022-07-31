@@ -59,12 +59,12 @@ func (tlv *PortStatus) Length() uint16 {
 }
 
 func (tlv *PortStatus) Value() []byte {
-	value := make([]byte, portStatusLen)
-	buffer := bytes.NewBuffer(value)
+	buffer := &bytes.Buffer{}
+	buffer.Grow(int(portStatusLen))
 	buffer.WriteByte(tlv.Port)
 	buffer.WriteByte(tlv.Status)
 	buffer.WriteByte(tlv.Unknown1)
-	return value
+	return buffer.Bytes()
 }
 
 func (tlv *PortStatus) String() string {

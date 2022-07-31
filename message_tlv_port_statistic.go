@@ -73,8 +73,8 @@ func (tlv *PortStatistic) Length() uint16 {
 }
 
 func (tlv *PortStatistic) Value() []byte {
-	value := make([]byte, portStatisticLen)
-	buffer := bytes.NewBuffer(value)
+	buffer := &bytes.Buffer{}
+	buffer.Grow(int(portStatisticLen))
 	buffer.WriteByte(tlv.Port)
 	binary.Write(buffer, binary.BigEndian, tlv.Received)
 	binary.Write(buffer, binary.BigEndian, tlv.Send)
@@ -82,7 +82,7 @@ func (tlv *PortStatistic) Value() []byte {
 	binary.Write(buffer, binary.BigEndian, tlv.Broadcasts)
 	binary.Write(buffer, binary.BigEndian, tlv.Multicasts)
 	binary.Write(buffer, binary.BigEndian, tlv.Errors)
-	return value
+	return buffer.Bytes()
 }
 
 func (tlv *PortStatistic) String() string {
