@@ -29,6 +29,7 @@ func TestConnSendReceiveMessageBroadcast(t *testing.T) {
 	conn, err := NewConn(connTestTarget, true)
 	require.Nil(t, err)
 	defer conn.Close()
+	conn.ReceiveDeviceLimit = 2
 	msg := prepareTestMessage()
 	responses, err := conn.SendReceiveMessage(msg)
 	require.Nil(t, err)

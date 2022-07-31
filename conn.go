@@ -20,6 +20,7 @@ import (
 
 const defaultReceiveBufferSize uint = 8192
 const defaultReceiveQueueLength uint = 16
+const defaultReceiveDeviceLimit uint = 0
 const defaultReceiveTimeout time.Duration = 2000 * time.Millisecond
 
 // Conn represents a network connection used for sending and receiving NSDP messages.
@@ -31,6 +32,7 @@ type Conn struct {
 	seq                Sequence
 	ReceiveBufferSize  uint          // Receive buffer size (defaults to 8192)
 	ReceiveQueueLength uint          // Receive queue length (defaults to 16)
+	ReceiveDeviceLimit uint          // Receive device limit (defaults to 0; no limit)
 	ReceiveTimeout     time.Duration // Receive timeout (defaults to 2s)
 	Debug              bool          // Enables debug output via log.Printf
 }
@@ -82,6 +84,7 @@ func NewConn(target string, debug bool) (*Conn, error) {
 		seq:                Sequence(time.Now().UnixNano()),
 		ReceiveBufferSize:  defaultReceiveBufferSize,
 		ReceiveQueueLength: defaultReceiveQueueLength,
+		ReceiveDeviceLimit: defaultReceiveDeviceLimit,
 		ReceiveTimeout:     defaultReceiveTimeout,
 		Debug:              debug,
 	}, nil
@@ -96,10 +99,14 @@ func (c *Conn) Close() error {
 //
 // The submitted message's host address and sequence number are ignored. Instead the connection state
 // is used to populate this info.
-// If the message's device address is empty (00:00:00:00:00:00), an arbitrary number of response messages is returned
-// and the call will utilize the full receive timeframe defined by ReceiveTimeout to wait for responses.
-// If the message's device address has been set, exactly one response message is returned and the call will return as
-// as one response is received.
+//
+// If the message's device address is empty (00:00:00:00:00:00), an arbitrary number of response messages is returned.
+// Furthermore the call will only finish after the receive timeout or the receive device limit is reached. Receiving no
+// response is not considered an error.
+//
+// If the message's device address has been set, exactly one response message is returned. Furthermore the call will
+// return as soon as a response is received. Receiving no response is considered an error.
+//
 // The returned map is build up using the responding device's hardware address string as the key and the corresponding
 // response message as the value.
 func (c *Conn) SendReceiveMessage(msg *Message) (map[string]*Message, error) {
@@ -144,6 +151,9 @@ func (c *Conn) sendReceiveBroadcastMessage(msg *Message) (map[string]*Message, e
 			return nil, received.err
 		}
 		receivedMsgs[received.msg.Header.DeviceAddress.String()] = received.msg
+		if 0 < c.ReceiveDeviceLimit && c.ReceiveDeviceLimit <= uint(len(receivedMsgs)) {
+			break
+		}
 	}
 	return receivedMsgs, nil
 }
