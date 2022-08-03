@@ -145,10 +145,10 @@ func (c *Conn) sendReceiveBroadcastMessage(msg *Message) (map[string]*Message, e
 	for {
 		received := <-receiveQueue
 		if received.err != nil {
-			if nerr, ok := received.err.(net.Error); ok && nerr.Timeout() {
-				break
+			if !isTimeoutErr(received.err) {
+				return nil, received.err
 			}
-			return nil, received.err
+			break
 		}
 		receivedMsgs[received.msg.Header.DeviceAddress.String()] = received.msg
 		if 0 < c.ReceiveDeviceLimit && c.ReceiveDeviceLimit <= uint(len(receivedMsgs)) {
@@ -234,6 +234,11 @@ func (c *Conn) checkMessageSequence(addr *net.UDPAddr, msg *Message) bool {
 		return false
 	}
 	return true
+}
+
+func isTimeoutErr(err error) bool {
+	netErr, ok := err.(net.Error)
+	return ok && netErr.Timeout()
 }
 
 func lookupHardwareAddr(addr *net.UDPAddr) (net.HardwareAddr, error) {

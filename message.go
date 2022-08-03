@@ -95,18 +95,9 @@ func UnmarshalMessageBuffer(buffer *bytes.Buffer) (*Message, error) {
 	}
 	tlvs := make([]TLV, 0)
 	for {
-		var tlvType uint16
-		err = binary.Read(buffer, binary.BigEndian, &tlvType)
+		tlvType, tlvLength, err := unmarshalMessageTLVTypeLength(buffer)
 		if err != nil {
-			return nil, fmt.Errorf("error while decoding TLV type; cause: %v", err)
-		}
-		var tlvLength uint16
-		err = binary.Read(buffer, binary.BigEndian, &tlvLength)
-		if err != nil {
-			return nil, fmt.Errorf("error while decoding TLV length; cause: %v", err)
-		}
-		if tlvLength > uint16(buffer.Len()) {
-			return nil, fmt.Errorf("excessive TLV length: %d (remaining: %d)", tlvLength, buffer.Len())
+			return nil, err
 		}
 		if tlvType == uint16(TypeEOM) {
 			if tlvLength != 0 {
@@ -114,14 +105,9 @@ func UnmarshalMessageBuffer(buffer *bytes.Buffer) (*Message, error) {
 			}
 			break
 		}
-		tlvValue := make([]byte, tlvLength)
-		_, err = buffer.Read(tlvValue)
+		tlv, err := unmarshalMessageTLVValue(buffer, tlvType, tlvLength)
 		if err != nil {
-			return nil, fmt.Errorf("error while decoding TLV value; cause: %v", err)
-		}
-		tlv, err := unmarshalTLV(tlvType, tlvValue)
-		if err != nil {
-			return nil, fmt.Errorf("error while decoding TLV type %04xh; cause: %v", tlvType, err)
+			return nil, err
 		}
 		tlvs = append(tlvs, tlv)
 	}
@@ -130,4 +116,34 @@ func UnmarshalMessageBuffer(buffer *bytes.Buffer) (*Message, error) {
 		Body:   tlvs,
 		EOM:    newEOM(),
 	}, nil
+}
+
+func unmarshalMessageTLVTypeLength(buffer *bytes.Buffer) (uint16, uint16, error) {
+	var tlvType uint16
+	err := binary.Read(buffer, binary.BigEndian, &tlvType)
+	if err != nil {
+		return 0, 0, fmt.Errorf("error while decoding TLV type; cause: %v", err)
+	}
+	var tlvLength uint16
+	err = binary.Read(buffer, binary.BigEndian, &tlvLength)
+	if err != nil {
+		return 0, 0, fmt.Errorf("error while decoding TLV length; cause: %v", err)
+	}
+	if tlvLength > uint16(buffer.Len()) {
+		return 0, 0, fmt.Errorf("excessive TLV length: %d (remaining: %d)", tlvLength, buffer.Len())
+	}
+	return tlvType, tlvLength, nil
+}
+
+func unmarshalMessageTLVValue(buffer *bytes.Buffer, tlvType uint16, tlvLength uint16) (TLV, error) {
+	tlvValue := make([]byte, tlvLength)
+	_, err := buffer.Read(tlvValue)
+	if err != nil {
+		return nil, fmt.Errorf("error while decoding TLV value; cause: %v", err)
+	}
+	tlv, err := unmarshalTLV(tlvType, tlvValue)
+	if err != nil {
+		return nil, fmt.Errorf("error while decoding TLV type %04xh; cause: %v", tlvType, err)
+	}
+	return tlv, nil
 }
