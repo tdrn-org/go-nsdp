@@ -119,11 +119,13 @@ func (responder *TestResponder) handleRequest(addr *net.UDPAddr, request []byte,
 
 // Stop stops this responder instance.
 func (responder *TestResponder) Stop() error {
-	_, err := responder.conn.WriteToUDP([]byte{0x00}, responder.taddr)
-	if err != nil {
-		return err
+	if responder.conn != nil {
+		_, err := responder.conn.WriteToUDP([]byte{0x00}, responder.taddr)
+		if err != nil {
+			return err
+		}
+		<-responder.stopped
+		log.Println("NSDP-TestResponder stopped")
 	}
-	<-responder.stopped
-	log.Println("NSDP-TestResponder stopped")
 	return nil
 }
