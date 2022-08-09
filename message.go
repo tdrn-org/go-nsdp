@@ -17,7 +17,7 @@ import (
 
 // NSDP message (see https://en.wikipedia.org/wiki/Netgear_Switch_Discovery_Protocol).
 //
-// A message is constructed from a Header an EOM marker as well as an arbitary number of TLV (type-length-value) payload elements.
+// A message is constructed from a Header an EOM marker as well as an arbitrary number of TLV (type-length-value) payload elements.
 // The Header defines the general message processing rules (espcially type of operation and target device). The TLV elements define
 // the actual message content.
 type Message struct {

@@ -229,7 +229,7 @@ func (c *Conn) unmarshalReceivedMessage(addr *net.UDPAddr, received []byte) (*Me
 func (c *Conn) checkMessageSequence(addr *net.UDPAddr, msg *Message) bool {
 	if msg.Header.Sequence != c.seq {
 		if c.Debug {
-			log.Printf("NSDP %s < %s:\nIgnoring unsolicted message (sequence: %04xh)", c.laddr, addr, msg.Header.Sequence)
+			log.Printf("NSDP %s < %s:\nIgnoring unsolicited message (sequence: %04xh)", c.laddr, addr, msg.Header.Sequence)
 		}
 		return false
 	}

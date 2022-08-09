@@ -8,7 +8,7 @@
 /*
 This package provides support for the NSDP (Netgear Switch Discovery Protocol).
 
-This protocal is udp based and uses a request response message flow. E.g. to query
+This protocol is udp based and uses a request response message flow. E.g. to query
 the name of all NSDP capable switches in the current network segment the
 following code snippet may be used:
 
