@@ -10,7 +10,7 @@ deps:
 
 .PHONE: testdeps
 testdeps: deps
-	go install honnef.co/go/tools/cmd/staticcheck@2023.1.2
+	go install honnef.co/go/tools/cmd/staticcheck@2023.1.6
 
 .PHONE: tidy
 tidy:
