@@ -1,4 +1,4 @@
-module github.com/hdecarne-github/go-nsdp
+module github.com/tdrn-org/go-nsdp
 
 go 1.21
 
