@@ -78,7 +78,7 @@ func (responder *TestResponder) listen() {
 	defer func() { responder.stopped <- true }()
 	buffer := make([]byte, 8192)
 	for _, responseChunk := range responder.responseChunks {
-		log.Printf("NSDP-TestResponder listening on %s", responder.taddr)
+		log.Printf("NSDP-TestResponder listening on %s", responder.conn.LocalAddr().String())
 		responder.started <- true
 		len, addr, err := responder.conn.ReadFromUDP(buffer)
 		if err != nil {
@@ -120,7 +120,7 @@ func (responder *TestResponder) handleRequest(addr *net.UDPAddr, request []byte,
 // Stop stops this responder instance.
 func (responder *TestResponder) Stop() error {
 	if responder.conn != nil {
-		_, err := responder.conn.WriteToUDP([]byte{0x00}, responder.taddr)
+		_, err := responder.conn.WriteTo([]byte{0x00}, responder.conn.LocalAddr())
 		if err != nil {
 			return err
 		}
@@ -128,4 +128,12 @@ func (responder *TestResponder) Stop() error {
 		log.Println("NSDP-TestResponder stopped")
 	}
 	return nil
+}
+
+// Target gets the actual address this responder instance is listening on.
+func (responder *TestResponder) Target() string {
+	if responder.conn != nil {
+		return responder.conn.LocalAddr().String()
+	}
+	return responder.taddr.String()
 }
