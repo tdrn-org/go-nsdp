@@ -27,7 +27,7 @@ func EmptyPortStatus() *PortStatus {
 	return &PortStatus{}
 }
 
-func NewPortStatus(port uint8, status uint8) *PortStatus {
+func NewPortStatus(port, status uint8) *PortStatus {
 	return &PortStatus{
 		Port:   port,
 		Status: status,
