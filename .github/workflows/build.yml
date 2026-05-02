@@ -38,5 +38,5 @@ jobs:
       - name: Run Build
         run: make check
       - name: Run SonarQube
-        uses: SonarSource/sonarqube-scan-action@v7.1.0
+        uses: SonarSource/sonarqube-scan-action@v8.0.0
     
